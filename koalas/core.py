@@ -99,7 +99,7 @@ class UtilMixin():
   # utilities
   def takeIndexes(self, index):
     "Filter frame by given index"
-    return self.loc[index] # much faster (test it :D)
+    return self.loc[index].asaf(self.__class__) # much faster (test it :D)
     #return self[self.frame.apply(lambda row: row.name in index, axis=1)]
 
   def groupSizeSort(self, field, ascending=False):
