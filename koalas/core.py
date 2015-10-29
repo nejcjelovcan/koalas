@@ -455,14 +455,24 @@ class ArgComb():
       yield name, c, func(**c)
       print
 
-  def charts(self, frames, group_func, basename, cls, chartname='line', **kwargs):
+  def charts(self, frames, group_func, basename, cls, chartname='line', appendframe=True, **kwargs):
     fr = []
     bg = BokehGroups(group_func, basename)
     for name, c, frame in (self.apply(frames) if callable(frames) else frames):
       fr.append((name, c, frame))
-      bg.setOutput(c)
+      fn = bg.setOutput(c)
       graph = cls(frame).load(name=name, comb=c)
       getattr(graph, chartname)(**kwargs)
+      if appendframe:
+        f = open(fn, 'r')
+        content = f.read()
+        f.close()
+        f = open(fn, 'w')
+        table = '<style>table.frame td, table.frame th{border: 0px solid black;} table.frame{border: 1px solid black; font-family: sans; float: right;} @media print { table.frame {float: none;} .plotdiv { page-break-after: always; } }</style>'\
+          + frame.to_html().replace('<table', '<table class="frame"')
+        content = content.replace('<div class="plotdiv"', '%s<div class="plotdiv"'%table)
+        f.write(content)
+        f.close()
     bg.glue()
     return fr
 
